@@ -468,7 +468,7 @@
     <div class="section-label">upload pdfs</div>
     <div class="dropzone" id="dropzone">
       <input type="file" id="fileInput" accept=".pdf" multiple />
-      <div class="drop-icon">⬆</div>
+
       <div class="drop-title">Drop PDF files here</div>
       <div class="drop-sub">
         Shipping bills, invoices, BoL, or any document<br>
@@ -532,8 +532,8 @@
 
 </div>
 <script>
-// ── CONFIG ── PASTE YOUR RAILWAY URL HERE
-const API_URL = 'https://pdfduck-backend-production.up.railway.app';
+// ── CONFIG ── API URL injected by Cloudflare Pages build
+const API_URL = typeof BACKEND_URL !== 'undefined' ? BACKEND_URL : 'https://your-backend-url-here.railway.app';
 
 // ── STATE ──
 let files         = [];

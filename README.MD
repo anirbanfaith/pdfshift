@@ -53,26 +53,33 @@ see `backend/README.md` for detailed deployment instructions.
 
 ### 2. deploy frontend to cloudflare pages
 
-```bash
-cd frontend  # or just use index.html + favicon.ico
-```
+**Important:** Your Railway backend URL is injected as an environment variable during build. This keeps it private.
 
-**option a — drag and drop:**
+1. push frontend files (including `build.sh`) to github
+2. go to [pages.cloudflare.com](https://pages.cloudflare.com)
+3. **Create project** → **Connect to Git** → select your repo
+4. build settings:
+   - **Build command:** `bash build.sh`
+   - **Build output directory:** `/`
+5. after first deploy, go to **Settings** → **Environment variables**
+6. add variable:
+   - **Name:** `BACKEND_URL`
+   - **Value:** `https://your-pdfduck-backend.up.railway.app` (your Railway URL)
+   - **Environment:** Production
+7. **Deployments** → **Retry deployment**
 
-1. go to [pages.cloudflare.com](https://pages.cloudflare.com)
-2. **Upload assets** → drag `index.html` + `favicon.ico`
-3. done — instant `*.pages.dev` url
+see `DEPLOYMENT.md` for detailed Cloudflare Pages setup.
 
-**option b — github:**
+---
 
-1. push frontend files to github
-2. cloudflare pages → connect repo → auto-deploy
+## why environment variables?
 
-### 3. configure
+Your Railway backend URL is kept secret via Cloudflare Pages environment variables. This means:
 
-open your frontend URL → click **⚙ settings** → paste your railway backend URL → **save & test**
-
-if the status dot turns green, you're live.
+- ✓ backend URL never appears in public repo
+- ✓ only your deployed site has the real URL
+- ✓ people who clone the repo can't abuse your Railway instance
+- ✓ you can change the backend URL without touching code
 
 ---
 
@@ -85,7 +92,8 @@ if the status dot turns green, you're live.
 3. remaining rows = data rows
 4. all rows from all tables are merged into a single JSON array
 5. if no tables found, it falls back to regex pattern matching for common fields:
-   - invoice number, date, amounts, consignee, shipper, etc.
+   - invoice number, date, amounts, consignee, shipper, email, phone, etc.
+6. if still minimal data, it extracts line-by-line (useful for resumes, general docs)
 
 **what works best:**
 
@@ -108,12 +116,14 @@ if the status dot turns green, you're live.
 ├── backend/
 │   ├── main.py              # FastAPI app
 │   ├── requirements.txt     # Python deps
-│   ├── Procfile             # Railway start command
+│   ├── Procfile             # Railway start command (optional)
 │   ├── railway.json         # Railway config
 │   └── README.md            # Backend deployment guide
 │
 ├── index.html               # Frontend (Cloudflare Pages)
 ├── favicon.ico              # Icon
+├── build.sh                 # Cloudflare Pages build script (injects env vars)
+├── DEPLOYMENT.md            # Cloudflare Pages deployment guide
 └── README.md                # This file
 ```
 
@@ -129,6 +139,7 @@ if the status dot turns green, you're live.
 ✓ copy to clipboard  
 ✓ mobile responsive  
 ✓ no AI API costs — pure PDF parsing  
+✓ secure backend URL via environment variables  
 
 ---
 
@@ -161,7 +172,17 @@ uvicorn main:app --reload
 
 ### frontend
 
-just open `index.html` in a browser. configure backend url to `http://localhost:8000`.
+just open `index.html` in a browser.
+
+**to test with local backend:**
+
+edit `index.html` line 318:
+
+```javascript
+const API_URL = typeof BACKEND_URL !== 'undefined' ? BACKEND_URL : 'http://localhost:8000';
+```
+
+then open `index.html` — it will hit your local backend.
 
 ---
 
@@ -178,7 +199,7 @@ curl -X POST http://your-backend/extract \
   -F "file=@document.pdf"
 ```
 
-**response (success):**
+**response (success - tables found):**
 
 ```json
 {
@@ -193,47 +214,38 @@ curl -X POST http://your-backend/extract \
       "_source_page": 1,
       "_source_table": 1,
       "_source_row": 1
-    },
-    ...
-  ]
-}
-```
-
-**response (no tables found — text pattern fallback):**
-
-```json
-{
-  "success": true,
-  "method": "text_pattern_extraction",
-  "rows": 1,
-  "data": [
-    {
-      "invoice_number": "INV-2024-001",
-      "date": "17-02-2026",
-      "total_amount": "5000.00",
-      "_raw_text_preview": "..."
     }
   ]
 }
 ```
 
-**response (failure):**
+**response (success - text extraction):**
 
 ```json
 {
-  "success": false,
-  "error": "No tables or structured data found in PDF"
+  "success": true,
+  "method": "text_extraction",
+  "rows": 1,
+  "data": [
+    {
+      "name": "John Doe",
+      "email": "john@example.com",
+      "phone": "+1-555-0100",
+      "line_1": "Software Engineer",
+      "_full_text": "...",
+      "_text_length": 1523
+    }
+  ]
 }
 ```
 
 ---
 
-## limitations
+## security notes
 
-- pdfplumber works best on **digital PDFs** with embedded text, not scanned images
-- table extraction accuracy depends on PDF structure (clean grids work best)
-- no AI inference means it can't "understand" context — it extracts what's visibly structured
-- for scanned PDFs, you'd need OCR preprocessing (tesseract, AWS textract, etc.)
+- backend URL is injected during build, never committed to repo
+- for additional security, add rate limiting via Railway or Cloudflare Workers
+- Railway backends are public by default — consider adding auth headers if needed
 
 ---
 
