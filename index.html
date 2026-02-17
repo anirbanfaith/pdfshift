@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pdfshift — bulk pdf → csv</title>
+  <title>pdfduck — bulk pdf → csv</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
@@ -437,7 +437,7 @@
   <header>
     <div class="logo">
       <div class="logo-icon">⇌</div>
-      pdfshift
+      pdfduck
       <span class="badge">internal</span>
     </div>
     <div class="header-right">
@@ -515,7 +515,7 @@
   </main>
 
   <footer>
-    <span>pdfshift — python backend on railway, pdfplumber extraction</span>
+    <span>pdfduck — python backend on railway, pdfplumber extraction</span>
     <span id="footerStatus">api: not configured</span>
   </footer>
 
@@ -554,7 +554,7 @@ const footerStatus   = document.getElementById('footerStatus');
 
 // ── LOAD SETTINGS ──
 function loadSettings() {
-  const saved = localStorage.getItem('pdfshift_api');
+  const saved = localStorage.getItem('pdfduck_api');
   if (saved) {
     apiUrl = saved;
     apiUrlInput.value = saved;
@@ -582,7 +582,7 @@ saveBtn.addEventListener('click', async () => {
 
   // remove trailing slash
   apiUrl = url.replace(/\/$/, '');
-  localStorage.setItem('pdfshift_api', apiUrl);
+  localStorage.setItem('pdfduck_api', apiUrl);
 
   settingsHint.textContent = 'testing connection...';
   const ok = await checkApiHealth();
@@ -821,7 +821,7 @@ downloadBtn.addEventListener('click', () => {
   const blob = new Blob([generateCSV()], { type: 'text/csv;charset=utf-8;' });
   const url  = URL.createObjectURL(blob);
   const a    = Object.assign(document.createElement('a'), {
-    href: url, download: `pdfshift_export_${new Date().toISOString().slice(0,10)}.csv`
+    href: url, download: `pdfduck_export_${new Date().toISOString().slice(0,10)}.csv`
   });
   a.click();
   URL.revokeObjectURL(url);
