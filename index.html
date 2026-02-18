@@ -58,7 +58,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 14px;
+      font-size: 20px;
       font-weight: 600;
       letter-spacing: -0.02em;
       color: var(--accent);
@@ -383,6 +383,12 @@
       margin-top: auto;
     }
 
+    a {
+      color: #666666;
+      text-decoration: none;
+      border: none;
+    }
+
     /* ── SPINNER ── */
     @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -453,8 +459,7 @@
   <!-- HEADER -->
   <header>
     <div class="logo">
-      <span class="logo-icon"></span>
-      pdfduck
+      <img src="logo.png" alt="Logo" class="logo-img" height="26" style="vertical-align: middle; margin-right: 8px;"> pdfduck
       <span class="badge">internal</span>
     </div>
     <div class="api-status">
@@ -529,7 +534,7 @@
 
   <footer>
     <span>Made with ❤︎ <br>
-    report & feature <a href="https://x.com/anirban_faith" ></a>@anirbanfaith</span>
+    report & feature <a href="https://x.com/anirban_faith" >@anirbanfaith</a></span>
   </footer>
 
 </div>
